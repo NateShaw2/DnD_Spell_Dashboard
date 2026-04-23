@@ -1,12 +1,36 @@
 import os
+import re
 import json
 from dotenv import load_dotenv
 
-def parse_spell_json():
+# Imports json of spells from a file specified in .env
+# and returns the python dictionary version of that json.
+def _import_spell_json():
     load_dotenv()
     file_path = os.getenv("FILE_PATH")
     with open(file_path, "r", encoding="utf-8") as file:
         data = json.load(file)
+
+    return data
+
+# Determines if a spell contains a material that is consumed on spell use.
+# Logic is that it checks if the word consume appears in material field or description.
+def _does_spell_consume(spell):
+    try:
+        if (re.search("consume", spell["material"]) is not None
+            or re.search("consume", spell["description"]) is not None):
+            spell["does_spell_consume"] = True
+        else:
+            spell["does_spell_consume"] = False
+
+    except KeyError:
+        spell["does_spell_consume"] = False
+
+def parse_spell_json():
+    data = _import_spell_json()
+    for spell in data:
+        _does_spell_consume(spell)
+
     return data
 
 def main():
