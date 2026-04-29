@@ -15,7 +15,9 @@ def _import_spell_json():
     return data
 
 def _get_material_cost(spell):
-    if "material" not in spell: return
+    if "material" not in spell: 
+        spell["material_cost"] = 0
+        return
 
     words = re.sub(r"[^\w\s]", "", spell["material"]).lower().split()
     material_cost = 0
