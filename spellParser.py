@@ -68,6 +68,13 @@ def _is_half_damage_on_success(spell):
         "half as much damage", spell["description"].lower()) is not None
     return
 
+def _does_damage(spell):
+    # Regex determines if the word damage appears and if the actual dice damage
+    # appears 2 terms before the word damage appears.
+    spell["does_damage"] = re.search(
+        r"\d+d\d+\s+\w+\s+damage", spell["description"]) is not None
+
+    return
 
 def parse_spell_json():
     data = _import_spell_json()
@@ -76,6 +83,7 @@ def parse_spell_json():
         _does_spell_consume(spell)
         _saving_throw_type(spell)
         _is_half_damage_on_success(spell)
+        _does_damage(spell)
 
     return data
 
