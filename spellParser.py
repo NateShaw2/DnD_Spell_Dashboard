@@ -76,6 +76,12 @@ def _does_damage(spell):
 
     return
 
+# Determines if a spell only belongs to a single class.
+def _is_exclusive(spell):
+    spell["is_exclusive"] = len(spell["classes"]) == 1
+
+    return
+
 def parse_spell_json():
     data = _import_spell_json()
     for spell in data:
@@ -84,6 +90,7 @@ def parse_spell_json():
         _saving_throw_type(spell)
         _is_half_damage_on_success(spell)
         _does_damage(spell)
+        _is_exclusive(spell)
 
     return data
 
