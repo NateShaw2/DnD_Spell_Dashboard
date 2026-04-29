@@ -14,10 +14,23 @@ def _import_spell_json():
 
     return data
 
+def _get_material_cost(spell):
+    if "material" not in spell: return
+
+    words = re.sub(r"[^\w\s]", "", spell["material"]).lower().split()
+    material_cost = 0
+    for i, word in enumerate(words):
+        if word == "gp" and i != 0:
+            material_cost += int(words[i - 1])
+
+    spell["material_cost"] = material_cost
+    return
+
 # Determines if a spell contains a material that is consumed on spell use.
 # Logic is that it checks if the word consume appears in material field or description.
 def _does_spell_consume(spell):
     try:
+        # Check to see if word consume appears.
         if (re.search("consume", spell["material"]) is not None
             or re.search("consume", spell["description"]) is not None):
             spell["does_spell_consume"] = True
@@ -38,6 +51,8 @@ class _stat_type(Enum):
 def _saving_throw_type(spell):
     word_list = spell["description"].lower().split()
     for i, word in enumerate(word_list):
+        # Condition determines if a stat_type word is in the description followed
+        # by the word "saving"
         if (word in _stat_type 
             and i < len(word_list) - 1 and word_list[i + 1] == "saving"):
             spell["saving_throw_type"] = word_list[i]
@@ -49,6 +64,7 @@ def _saving_throw_type(spell):
 def parse_spell_json():
     data = _import_spell_json()
     for spell in data:
+        _get_material_cost(spell)
         _does_spell_consume(spell)
         _saving_throw_type(spell)
 
