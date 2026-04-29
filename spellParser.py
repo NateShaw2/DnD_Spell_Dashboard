@@ -33,8 +33,8 @@ def _get_material_cost(spell):
 def _does_spell_consume(spell):
     try:
         # Check to see if word consume appears.
-        if (re.search("consume", spell["material"]) is not None
-            or re.search("consume", spell["description"]) is not None):
+        if (re.search("consume", spell["material"].lower()) is not None
+            or re.search("consume", spell["description"].lower()) is not None):
             spell["does_spell_consume"] = True
         else:
             spell["does_spell_consume"] = False
@@ -63,12 +63,19 @@ def _saving_throw_type(spell):
     spell["saving_throw_type"] = None
     return
 
+def _is_half_damage_on_success(spell):
+    spell["is_half_damage_on_success"] = re.search(
+        "half as much damage", spell["description"].lower()) is not None
+    return
+
+
 def parse_spell_json():
     data = _import_spell_json()
     for spell in data:
         _get_material_cost(spell)
         _does_spell_consume(spell)
         _saving_throw_type(spell)
+        _is_half_damage_on_success(spell)
 
     return data
 
