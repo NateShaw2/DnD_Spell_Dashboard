@@ -70,9 +70,9 @@ def _is_half_damage_on_success(spell):
 
 def _does_damage(spell):
     # Regex determines if the word damage appears and if the actual dice damage
-    # appears 2 terms before the word damage appears.
+    # appears before the word damage appears.
     spell["does_damage"] = re.search(
-        r"\d+d\d+\s+\w+\s+damage", spell["description"]) is not None
+        r"\d+d\d.*damage", spell["description"]) is not None
 
     return
 
