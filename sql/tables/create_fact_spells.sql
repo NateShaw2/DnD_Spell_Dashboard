@@ -2,7 +2,7 @@ CREATE TABLE fact_spells (
 	spell_id INT IDENTITY(1,1) PRIMARY KEY,
 	name VARCHAR(255) NOT NULL,
 	level TINYINT NOT NULL,
-	school_ID INT NOT NULL,
+	school_id INT NOT NULL,
 	action_type VARCHAR(255) NOT NULL,
 	is_concentration BIT NOT NULL,
 	is_ritual BIT NOT NULL,

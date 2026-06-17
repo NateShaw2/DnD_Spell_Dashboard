@@ -1,5 +1,5 @@
-CREATE TABLE bridge_spells_and_schools (
+CREATE TABLE bridge_spells_and_classes (
 	spell_id INT,
-	school_id INT,
-	CONSTRAINT PK_spells_and_schools PRIMARY KEY(spell_id, school_id)
+	class_id INT,
+	CONSTRAINT PK_spells_and_classes PRIMARY KEY(spell_id, class_id)
 )
