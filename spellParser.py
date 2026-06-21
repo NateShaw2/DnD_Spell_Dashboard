@@ -16,7 +16,7 @@ def _import_spell_json():
 
 def _get_material_cost(spell):
     if "material" not in spell: 
-        spell["material_cost"] = 0
+        spell["materialCost"] = 0
         return
 
     words = re.sub(r"[^\w\s]", "", spell["material"]).lower().split()
@@ -25,7 +25,7 @@ def _get_material_cost(spell):
         if word == "gp" and i != 0:
             material_cost += int(words[i - 1])
 
-    spell["material_cost"] = material_cost
+    spell["materialCost"] = material_cost
     return
 
 # Determines if a spell contains a material that is consumed on spell use.
@@ -35,12 +35,12 @@ def _does_spell_consume(spell):
         # Check to see if word consume appears.
         if (re.search("consume", spell["material"].lower()) is not None
             or re.search("consume", spell["description"].lower()) is not None):
-            spell["does_spell_consume"] = True
+            spell["doesSpellConsume"] = True
         else:
-            spell["does_spell_consume"] = False
+            spell["doesSpellConsume"] = False
 
     except KeyError:
-        spell["does_spell_consume"] = False
+        spell["doesSpellConsume"] = False
 
 class _stat_type(Enum):
     STR = "strength"
@@ -57,28 +57,28 @@ def _saving_throw_type(spell):
         # by the word "saving"
         if (word in _stat_type 
             and i < len(word_list) - 1 and word_list[i + 1] == "saving"):
-            spell["saving_throw_type"] = word_list[i]
+            spell["savingThrowType"] = word_list[i]
             return
 
-    spell["saving_throw_type"] = None
+    spell["savingThrowType"] = None
     return
 
 def _is_half_damage_on_success(spell):
-    spell["is_half_damage_on_success"] = re.search(
+    spell["isHalfDamageOnSuccess"] = re.search(
         "half as much damage", spell["description"].lower()) is not None
     return
 
 def _does_damage(spell):
     # Regex determines if the word damage appears and if the actual dice damage
     # appears before the word damage appears.
-    spell["does_damage"] = re.search(
+    spell["doesDamage"] = re.search(
         r"\d+d\d.*damage", spell["description"]) is not None
 
     return
 
 # Determines if a spell only belongs to a single class.
 def _is_exclusive(spell):
-    spell["is_exclusive"] = len(spell["classes"]) == 1
+    spell["isExclusive"] = len(spell["classes"]) == 1
 
     return
 

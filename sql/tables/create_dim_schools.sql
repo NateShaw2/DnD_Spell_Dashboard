@@ -1,0 +1,4 @@
+CREATE TABLE dim_schools (
+	school_id INT IDENTITY(1,1) PRIMARY KEY,
+	name VARCHAR(255) NOT NULL UNIQUE
+)
