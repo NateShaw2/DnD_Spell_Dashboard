@@ -68,6 +68,8 @@ def _insert_into_fact_spells(spell: dict):
     conn = get_connection()
     cursor = conn.cursor()
 
+    components = spell.get("components")
+
     params = {
         "name": spell.get("name"),
         "level": spell.get("level"),
@@ -77,9 +79,10 @@ def _insert_into_fact_spells(spell: dict):
         "is_ritual": spell.get("ritual"),
         "casting_time": spell.get("castingTime"),
         "range": spell.get("range"),
-        "require_visual_component": "v" in spell.get("components"),
-        "require_somatic_component": "s" in spell.get("components"),
-        "require_material_component": "m" in spell.get("components"),
+        "require_visual_component": "v" in components,
+        "require_somatic_component": "s" in components,
+        "require_material_component": "m" in components,
+        "components": " ".join([letter.upper() for letter in components]),
         "duration": spell.get("duration"),
         "description": spell.get("description"),
         "materials": spell.get("material"),
@@ -96,7 +99,7 @@ def _insert_into_fact_spells(spell: dict):
     ordered_keys = [
         "name", "level", "school_name", "action_type", "is_concentration",
         "is_ritual", "casting_time", "range", "require_visual_component",
-        "require_somatic_component", "require_material_component", "duration",
+        "require_somatic_component", "require_material_component", "components", "duration",
         "description", "materials", "cantrip_upgrade", "higher_level_slot",
         "material_cost", "does_spell_consume", "saving_throw_type",
         "is_half_damage_on_success", "does_damage", "is_exclusive"
