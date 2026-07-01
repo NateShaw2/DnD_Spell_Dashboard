@@ -16,12 +16,14 @@ def get_connection():
 def _get_dim_table_data(spells: dict):
     dim_data = {
         "schools": [],
-        "classes": []
+        "classes": [],
+        "damage_types": []
     }
 
     for spell in spells:
         school = spell["school"]
         classes_data = spell["classes"]
+        damage_types = spell["damageTypes"]
 
         if school not in dim_data["schools"]:
             dim_data["schools"].append(school)
@@ -29,6 +31,12 @@ def _get_dim_table_data(spells: dict):
         for class_data in classes_data:
             if class_data not in dim_data["classes"]:
                 dim_data["classes"].append(class_data)
+
+        for damage_type in damage_types:
+            if damage_type not in dim_data["damage_types"]:
+                dim_data["damage_types"].append(damage_type)
+
+    dim_data["damage_types"].append("No Damage Type")
 
     return dim_data
 
@@ -45,7 +53,8 @@ def insert_into_dim_tables(spells: dict):
     dim_data = _get_dim_table_data(spells)
     dim_tables = [
         {"table": "dim_schools", "values": dim_data["schools"]},
-        {"table": "dim_classes", "values": dim_data["classes"]}
+        {"table": "dim_classes", "values": dim_data["classes"]},
+        {"table": "dim_damage_types", "values": dim_data["damage_types"]}
     ]
 
     conn = get_connection()
@@ -133,10 +142,33 @@ def _insert_into_bridge_spells_and_classes(spell: dict):
     conn.commit()
     conn.close()
 
+def _insert_into_bridge_spells_and_damage_types(spell: dict):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    damage_types = spell.get("damageTypes")
+    if len(damage_types) == 0: damage_types.append("No Damage Type")
+
+    for damage_type in damage_types:
+        params = {
+            "spell_name": spell.get("name"),
+            "damage_type_name": damage_type
+        }
+
+        ordered_keys = ["spell_name", "damage_type_name"]
+
+        params_ordered = [params[k] for k in ordered_keys]
+        placeholders = ", ".join(["?"] * len(params))
+        cursor.execute(f"{{CALL usp_insert_bridge_spell_and_damage_type({placeholders})}}", params_ordered)
+
+    conn.commit()
+    conn.close()    
+
 def insert_into_spells(spells: dict):
     for spell in spells:
         _insert_into_fact_spells(spell)
         _insert_into_bridge_spells_and_classes(spell)
+        _insert_into_bridge_spells_and_damage_types(spell)
 
 def main():
     spells = parse_spell_json()
