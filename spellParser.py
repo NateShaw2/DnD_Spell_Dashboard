@@ -101,7 +101,7 @@ def _damage_type(spell: dict):
             if damage_type in word_list:
                 spell["damageTypes"].append(damage_type)
 
-def parse_spell_json(damage_Type_On: bool = False):
+def parse_spell_json(damage_Type_Off: bool = False):
     data = _import_spell_json()
     for spell in data:
         _get_material_cost(spell)
@@ -110,7 +110,7 @@ def parse_spell_json(damage_Type_On: bool = False):
         _is_half_damage_on_success(spell)
         _does_damage(spell)
 
-        if (damage_Type_On):
+        if (not damage_Type_Off):
             _damage_type(spell)
         else: 
             spell["damageType"] = None
@@ -121,9 +121,9 @@ def parse_spell_json(damage_Type_On: bool = False):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--damageTypeOn", help="Adds damage type data", action="store_true")
+    parser.add_argument("--damageTypeOff", help="Adds damage type data", action="store_true")
     args = parser.parse_args()
-    print(json.dumps(parse_spell_json(damage_Type_On = args.damageTypeOn), indent=2))
+    print(json.dumps(parse_spell_json(damage_Type_Off = args.damageTypeOff), indent=2))
 
 if __name__ == "__main__":
     main()
