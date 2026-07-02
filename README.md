@@ -48,18 +48,21 @@ DB_DATABASE=
 
 Run the SQL scripts in the following order in SQL Server Management Studio (SSMS) or Azure Data Studio:
 
-**Tables (run all four in any order):**
+**Tables (run all six in any order):**
 - `sql/tables/create_fact_spells.sql`
 - `sql/tables/create_dim_classes.sql`
 - `sql/tables/create_dim_schools.sql`
+- `sql/tables/create_dim_damage_types.sql`
 - `sql/tables/create_bridge_spells_and_classes.sql`
+- `sql/tables/create_bridge_spells_and_damage_types.sql`
 
-**Foreign Keys (must run after all four tables above):**
+**Foreign Keys (must run after all six tables above):**
 - `sql/tables/add_foreign_keys.sql`
 
 **Stored Procedures (run in any order):**
 - `sql/stored_procedures/usp_insert_spell.sql`
 - `sql/stored_procedures/usp_insert_spell_and_class.sql`
+- `sql/stored_procedures/usp_insert_spell_and_damage_type.sql`
 
 ### 5. Add Your Spells JSON
 
@@ -112,7 +115,7 @@ To use your own spells, replace `test_data.json` with your own file and update `
 ]
 ```
 
-> **Note on descriptions:** `spellParser.py` derives several fields automatically from the description text. For saving throws to be detected, write them as `"<stat> saving throw"` (e.g. `"Dexterity saving throw"`). For damage to be detected, include a dice expression before the word damage (e.g. `"3d8 Fire damage"`). For half-damage on a successful save to be detected, include the phrase `"half as much damage"`.
+> **Note on descriptions:** `spellParser.py` derives several fields automatically from the description text. For saving throws to be detected, write them as `"<stat> saving throw"` (e.g. `"Dexterity saving throw"`). For damage to be detected, include a dice expression before the word damage (e.g. `"3d8 Fire damage"`). For half-damage on a successful save to be detected, include the phrase `"half as much damage"`. For damage type to be detected, make sure that damage is detected and that the damage type you want is in the hard-coded _damage_types enum in the spellParser.py file. You can edit the hard-coded _damage_types enum to remove or add damage types. You can also use modify the upload.py argument to use the --damageTypeOff argument to have all damage types be no damage type when inserting into the database.
 
 ## Running the Pipeline
 
