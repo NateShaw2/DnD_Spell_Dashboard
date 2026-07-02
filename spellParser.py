@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import argparse
 from dotenv import load_dotenv
 from enum import Enum
 
@@ -14,7 +15,7 @@ def _import_spell_json():
 
     return data
 
-def _get_material_cost(spell):
+def _get_material_cost(spell: dict):
     if "material" not in spell: 
         spell["materialCost"] = 0
         return
@@ -26,11 +27,10 @@ def _get_material_cost(spell):
             material_cost += int(words[i - 1])
 
     spell["materialCost"] = material_cost
-    return
 
 # Determines if a spell contains a material that is consumed on spell use.
 # Logic is that it checks if the word consume appears in material field or description.
-def _does_spell_consume(spell):
+def _does_spell_consume(spell: dict):
     try:
         # Check to see if word consume appears.
         if (re.search("consume", spell["material"].lower()) is not None
@@ -50,39 +50,58 @@ class _stat_type(Enum):
     WIS = "wisdom"
     CHAR = "charisma"
 
-def _saving_throw_type(spell):
+def _saving_throw_type(spell: dict):
     word_list = spell["description"].lower().split()
     for i, word in enumerate(word_list):
         # Condition determines if a stat_type word is in the description followed
         # by the word "saving"
-        if (word in _stat_type 
+        if (word in _stat_type._value2member_map_ 
             and i < len(word_list) - 1 and word_list[i + 1] == "saving"):
             spell["savingThrowType"] = word_list[i]
             return
 
     spell["savingThrowType"] = None
-    return
 
-def _is_half_damage_on_success(spell):
+def _is_half_damage_on_success(spell: dict):
     spell["isHalfDamageOnSuccess"] = re.search(
         "half as much damage", spell["description"].lower()) is not None
-    return
 
-def _does_damage(spell):
+def _does_damage(spell: dict):
     # Regex determines if the word damage appears and if the actual dice damage
     # appears before the word damage appears.
     spell["doesDamage"] = re.search(
         r"\d+d\d.*damage", spell["description"]) is not None
 
-    return
-
 # Determines if a spell only belongs to a single class.
-def _is_exclusive(spell):
+def _is_exclusive(spell : dict):
     spell["isExclusive"] = len(spell["classes"]) == 1
 
-    return
+class _damage_types(Enum):
+    ACID = "acid"
+    BLUDGEONING = "bludgeoning"
+    COLD = "cold"
+    FIRE = "fire"
+    FORCE = "force"
+    LIGHTNING = "lightning"
+    NECROTIC = "necrotic"
+    PIERCING = "piercing"
+    POISON = "poison"
+    PSYCHIC = "psychic"
+    RADIANT = "radiant"
+    SLASHING = "slashing"
+    THUNDER = "thunder"
 
-def parse_spell_json():
+def _damage_type(spell: dict):
+    spell["damageTypes"] = []
+
+    if spell["doesDamage"]:
+        word_list = re.sub(r"[^\w\s]", "", spell["description"]).lower().split()
+
+        for damage_type in _damage_types._value2member_map_:
+            if damage_type in word_list:
+                spell["damageTypes"].append(damage_type)
+
+def parse_spell_json(damage_Type_Off: bool = False):
     data = _import_spell_json()
     for spell in data:
         _get_material_cost(spell)
@@ -90,12 +109,21 @@ def parse_spell_json():
         _saving_throw_type(spell)
         _is_half_damage_on_success(spell)
         _does_damage(spell)
+
+        if (not damage_Type_Off):
+            _damage_type(spell)
+        else: 
+            spell["damageType"] = None
+
         _is_exclusive(spell)
 
     return data
 
 def main():
-    print(json.dumps(parse_spell_json(), indent=2))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--damageTypeOff", help="Adds damage type data", action="store_true")
+    args = parser.parse_args()
+    print(json.dumps(parse_spell_json(damage_Type_Off = args.damageTypeOff), indent=2))
 
 if __name__ == "__main__":
     main()
