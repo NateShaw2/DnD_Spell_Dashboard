@@ -138,8 +138,10 @@ The dashboard expects the following tables in your database:
 
 - `fact_spells`
 - `bridge_spells_and_classes`
+- `bridge_spells_and_damage_types`
 - `dim_classes`
 - `dim_schools`
+- `dim_damage_types`
 
 ## Project Structure
 
@@ -156,9 +158,12 @@ DnD_Spell_Dashboard/
     │   ├── create_fact_spells.sql
     │   ├── create_dim_classes.sql
     │   ├── create_dim_schools.sql
+    │   ├── create_dim_damage_types.sql    
     │   ├── create_bridge_spells_and_classes.sql
+    │   ├── create_bridge_spells_and_damage_types.sql
     │   └── add_foreign_keys.sql
     └── stored_procedures/
         ├── usp_insert_spell.sql
-        └── usp_insert_spell_and_class.sql
+        ├── usp_insert_spell_and_class.sql
+        └── usp_insert_spell_and_damage_type.sql
 ```
